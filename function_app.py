@@ -1,7 +1,14 @@
 import azure.functions as func 
-from queue_storage_trigger import bp as bp_queue
-from servicebus_trigger import bp as bp_svbus
+from queue_storage import queue_trigger, queue_output, queue_poison_trigger
+from service_bus.trigger import bp as bp_svbus
 
 app = func.FunctionApp() 
 
-app.register_functions(bp_queue)
+blueprints = [
+    queue_poison_trigger.bp,
+    queue_output.bp,
+    queue_trigger.bp
+]
+
+for bp in blueprints:
+    app.register_functions(bp)
