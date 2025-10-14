@@ -5,8 +5,8 @@ bp = func.Blueprint()
 
 @bp.service_bus_queue_trigger(
     arg_name="msg",
-    queue_name="myservicebusqueue",
-    connection="ServiceBusConnection"
+    queue_name="sbq-training",
+    connection="ServiceBusQueueConnection"
 )
 def servicebus_trigger(msg: func.ServiceBusMessage):
     message_body = msg.get_body().decode("utf-8")
