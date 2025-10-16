@@ -1,8 +1,8 @@
 import os
 import logging
 import datetime
-from azure.servicebus import ServiceBusClient, ServiceBusMessage, ServiceBusSubQueue
 import azure.functions as func
+from azure.servicebus import ServiceBusClient, ServiceBusMessage, ServiceBusSubQueue
 
 
 bp = func.Blueprint()
@@ -63,3 +63,26 @@ def topic_dlq_resend_timer(mytimer: func.TimerRequest):
                         dlq_receiver.abandon_message(msg)
 
     logging.info("Topic DLQ resend process finished.")
+
+class MaxTryReached(Exception):
+    pass
+
+
+@bp.timer_trigger(schedule="*/1 * * * * *", arg_name="mytimer")
+@bp.retry(strategy="exponential_backoff", max_retry_count="3",
+           minimum_interval="00:00:01",
+           maximum_interval="00:01:00")
+def timerfunc(mytimer: func.TimerRequest, context: func.Context) -> None:
+    logging.info(f'Current retry count: {context.retry_context.retry_count}')
+    try:
+        if context.retry_context.retry_count == \
+                context.retry_context.max_retry_count:
+            logging.info(
+                f"Max retries of {context.retry_context.max_retry_count} for "
+                f"function {context.function_name} has been reached")
+            raise MaxTryReached("Max retries has been reached")
+        else:
+            raise Exception("This is a retryable exception")
+    except MaxTryReached as e:
+        logging.error(str(e))
+    
