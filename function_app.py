@@ -6,12 +6,12 @@ from time_trigger import time_trigger
 app = func.FunctionApp()
 
 blueprints = [
-    queue_poison_trigger.bp,
-    queue_output.bp,
-    queue_trigger.bp,
-    sbq_trigger.bp,
-    sbt_trigger.bp,
-    sbt_output.bp,
+    # queue_poison_trigger.bp,
+    # queue_output.bp,
+    # queue_trigger.bp,
+    # sbq_trigger.bp,
+    # sbt_trigger.bp,
+    # sbt_output.bp,
     time_trigger.bp
 ]
 
